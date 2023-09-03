@@ -1,8 +1,30 @@
+"use client"
 import githubLogo from "../../../public/img/icons8-github.svg";
 import gmailLogo from "../../../public/img/icons8-google.svg";
 import Image from "next/image";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Database } from "../../../types/supabase";
+
 
 export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
+  const supabase = createClientComponentClient<Database>()
+
+
+  const handleSignUp = async () => {
+    await supabase.auth.signUp({
+      email:email,
+      password:password,
+      options: {
+        emailRedirectTo: `${location.origin}/auth/callback`,
+      },
+    })
+    router.refresh()
+  }
   return (
     <div className="hero min-h-screen font-inconsolata select-none">
       <div className="hero-content flex-col lg:flex-row-reverse gap-32">
@@ -24,21 +46,30 @@ export default function Login() {
               <input type="text" placeholder="KarareAloo" className="input input-bordered bg-accident" />
             </div>
             <div className="form-control ">
-              <label className="label ">
+              <label htmlFor="email" className="label ">
                 <span className="label-text ">Email</span>
               </label>
-              <input type="text" placeholder="crispyaloo@gmail.com" className="input input-bordered bg-accident"  />
+              <input
+              name="email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email} 
+              type="text" placeholder="crispyaloo@gmail.com" className="input input-bordered bg-accident"  />
             </div>
             <div className="form-control">
-              <label className="label">
+              <label htmlFor="password" className="label">
                 <span className="label-text">Password</span>
               </label>
-              <input type="text" placeholder="GolGappe6969" className="input input-bordered bg-accident" />
+              <input
+              type="password"
+              name="password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password} 
+              placeholder="GolGappe6969" className="input input-bordered bg-accident" />
             </div>
             <div className="form-control mt-4">
               <div className="flex justify-center items-center flex-col w-full">
                 {/* Increased gap between Login button and other buttons */}
-                <button className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white">
+                <button onClick={handleSignUp} className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white">
                   Signup
                 </button>
                 {/* Horizontal line with adjusted text size */}

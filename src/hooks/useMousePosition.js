@@ -1,3 +1,4 @@
+"use server"
 
 import { useState, useEffect } from "react";
 

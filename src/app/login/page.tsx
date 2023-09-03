@@ -1,8 +1,42 @@
+'use client'
 import githubLogo from "../../../public/img/icons8-github.svg";
 import gmailLogo from "../../../public/img/icons8-google.svg";
 import Image from "next/image";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Database } from "../../../types/supabase";
 
 export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
+  const supabase = createClientComponentClient<Database>()
+
+  const handleSignUp = async () => {
+    await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${location.origin}/auth/callback`,
+      },
+    })
+    router.refresh()
+  }
+
+  const handleLogIn = async () => {
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    router.refresh()
+  }
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.refresh()
+  }
+
   return (
     <div className="hero min-h-screen font-inconsolata select-none">
       <div className="hero-content flex-col lg:flex-row gap-32">
@@ -15,19 +49,28 @@ export default function Login() {
             Need assistance or have questions? Our support team is here to help. Contact us anytime; we are just a message away!
           </p>
         </div>
-        <div className="card bg-accident flex-shrink-0 w-full max-w-sm shadow-2xl shadow-secondary">
+        <form action="/auth/login" method="post" className="card bg-accident flex-shrink-0 w-full max-w-sm shadow-2xl shadow-secondary">
           <div className="px-8 py-5 card-body">
             <div className="form-control ">
-              <label className="label ">
+              <label htmlFor="email" className="label ">
                 <span className="label-text ">Email</span>
               </label>
-              <input type="text" placeholder="crispyaloo@gmail.com" className="input input-bordered bg-accident"  />
+              <input
+               name="email"
+               onChange={(e) => setEmail(e.target.value)}
+               value={email}
+               type="text" placeholder="crispyaloo@gmail.com" className="input input-bordered bg-accident"  />
             </div>
             <div className="form-control">
-              <label className="label">
+              <label htmlFor="password" className="label">
                 <span className="label-text">Password</span>
               </label>
-              <input type="text" placeholder="GolGappe6969" className="input input-bordered bg-accident" />
+              <input
+                type="password"
+                name="password"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                placeholder="GolGappe6969" className="input input-bordered bg-accident" />
               <label className="label">
                 <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
               </label>
@@ -35,7 +78,7 @@ export default function Login() {
             <div className="form-control mt-1">
               <div className="flex justify-center items-center flex-col w-full">
                 {/* Increased gap between Login button and other buttons */}
-                <button className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white">
+                <button onClick={handleLogIn} className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white">
                   Login
                 </button>
                 {/* Horizontal line with adjusted text size */}
@@ -66,7 +109,7 @@ export default function Login() {
               <span className="text-md mt-[-25px] underline underline-offset-3">SignUp Here</span>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
