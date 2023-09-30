@@ -14,7 +14,6 @@ export default async function Home() {
     const { data: { session }} = await supabase.auth.getSession();
   return (
     <>
-    <Navbar></Navbar>
     <div className="flex justify-center items-center select-none gap-32 p-4 py-24 ">
       <div className='flex justify-center items-start flex-col w-fit z-[99]'>
         <h1 className='text-4xl font-inconsolata text-left mb-[-4px] ml-[10px] font-extralight' style={{filter: `drop-shadow(0px 0px 8px #035e45`}}>Welcome to</h1>

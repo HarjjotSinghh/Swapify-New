@@ -6,12 +6,38 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Database } from "../../../types/supabase";
+import cn from 'classnames';
+import { Field, Form, Formik } from 'formik';
+import Link from 'next/link';
+import * as Yup from 'yup';
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+
+
+const SignInSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string().required('Required'),
+});
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClientComponentClient();
+  const [errorMsg, setErrorMsg] = useState('');
+
+  async function signIn(formData:any) {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      window.location = window.location.origin;
+    }
+  }
 
   const handleSignUp = async () => {
     await supabase.auth.signUp({
@@ -49,8 +75,60 @@ export default function Login() {
             Need assistance or have questions? Our support team is here to help. Contact us anytime; we are just a message away!
           </p>
         </div>
-        <form action="/auth/login" method="post" className="card bg-accident flex-shrink-0 w-full max-w-sm shadow-2xl shadow-secondary">
-          <div className="px-8 py-5 card-body">
+        <Formik 
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={SignInSchema}
+          onSubmit={signIn}
+          >
+             {({ errors, touched }) => (
+              <Form className="card bg-accident flex-shrink-0 w-full max-w-sm shadow-2xl shadow-secondary p-12">
+                <label htmlFor="email">Email</label>
+                <Field
+                  className={cn('input', errors.email && touched.email && 'bg-red-950/30')}
+                  id="email"
+                  name="email"
+                  placeholder="JohnDoe69@swapify.com"
+                  type="email"
+                />
+                {errors.email && touched.email ? (
+                  <div className="text-red-600/80">{errors.email}</div>
+                ) : null}
+
+                <label htmlFor="email">Password</label>
+                <Field
+                  className={cn('input', errors.password && touched.password && 'bg-red-950/30')}
+                  placeholder="MyPassword#6969"
+                  id="password"
+                  name="password"
+                  type="password"
+                />
+                {errors.password && touched.password ? (
+                  <div className="text-red-600/80">{errors.password}</div>
+                ) : null}
+
+                <Link href="/reset-password" className="label-text-alt link link-hover pt-2">
+                  Forgot your password?
+                </Link>
+                <br></br>
+                <button className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white" type="submit">
+                  LOGIN
+                </button>
+                {errorMsg && <div className="text-red-600/80">{errorMsg}</div>}
+                <br></br>
+                <div className="flex flex-col justify-center items-center pt-1">
+                  <p className="text-sm">{`Don't have an account`}?</p>
+                  <Link href="/sign-up">
+                  <span className="text-md underline underline-offset-3">Signup Here</span>
+                  </Link> 
+                </div>      
+              </Form>
+          )}
+          </Formik>
+          
+          {/* <div className="px-8 py-5 card-body">
             <div className="form-control ">
               <label htmlFor="email" className="label ">
                 <span className="label-text ">Email</span>
@@ -77,20 +155,15 @@ export default function Login() {
             </div>
             <div className="form-control mt-1">
               <div className="flex justify-center items-center flex-col w-full">
-                {/* Increased gap between Login button and other buttons */}
-                <button onClick={handleLogIn} className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white">
+                <button type="submit" onClick={handleLogIn} className="btn w-full mb-2 bg-primary-dark border-accent hover:bg-primary-dark text-white">
                   Login
                 </button>
-                {/* Horizontal line with adjusted text size */}
                 <div className="w-full flex items-center mb-2">
                   <hr className="w-full border-t border-solid border-gray-300" />
                   <span className="mx-3 text-gray-500 text-md">OR</span>
                   <hr className="w-full border-t border-solid border-gray-300" />
                 </div>
-                {/* End of horizontal line */}
-                {/* Buttons container with adjusted widths */}
                 <div className="flex gap-2 w-full justify-center items-center">
-                  {/* Decreased width of Gmail and GitHub buttons */}
                   <button className="btn w-[48.5%] bg-primary-darker border-primary-darker hover:bg-primary-darker text-white">
                     <Image src={gmailLogo} alt="Gmail Icon" width={16} height={16} className="inline-block mr-2" />
                     <span className="mb-[1px]">Google</span>
@@ -100,7 +173,6 @@ export default function Login() {
                     <span className="mb-[1px]">GitHub</span>
                   </button>
                 </div>
-                {/* End of Buttons container */}
               </div>
             </div>
             <div className="flex flex-col justify-center items-center pt-1">
@@ -108,8 +180,8 @@ export default function Login() {
               <br />
               <span className="text-md mt-[-25px] underline underline-offset-3">SignUp Here</span>
             </div>
-          </div>
-        </form>
+          </div> */}
+        
       </div>
     </div>
   );

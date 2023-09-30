@@ -14,9 +14,9 @@ const UpdatePasswordSchema = Yup.object().shape({
 const UpdatePassword = () => {
   const supabase = createClientComponentClient();
   const router = useRouter();
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  async function updatePassword(formData) {
+  async function updatePassword(formData: {password : string}) {
     const { error } = await supabase.auth.updateUser({
       password: formData.password,
     });

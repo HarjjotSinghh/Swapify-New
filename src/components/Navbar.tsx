@@ -6,7 +6,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/dist/server/api-utils'
-
+import SignOut  from './SignOut.tsx'
 
 export default async function Navbar() {
     const supabase = createServerComponentClient( { cookies });
@@ -21,11 +21,11 @@ export default async function Navbar() {
     return (
     <div className="py-4 px-8 flex justify-center items-center select-none bg-background/70 sticky top-0 z-[9999] backdrop-filter backdrop-blur-md shadow-2xl shadow-secondary/10">
     <div className="flex-1">
-        <a className="py-1 px-4 font-majorMono normal-case text-xl font-bold">swApify</a>
+        <Link href="/">
+            <span className="py-1 px-4 font-majorMono normal-case text-xl font-bold">swApify</span>
+        </Link>
     </div>
     <div className="flex flex-row justify-center items-center gap-8">   
-        <div className="font-inconsolata text-lg font-light">Home</div>
-        <div className="font-inconsolata text-lg font-light">Users</div>
         {session ?
         <>
                 <div className="flex justify-center items-center gap-8">
@@ -45,12 +45,8 @@ export default async function Navbar() {
                         <li><a>Logout</a></li>
                     </ul>
                 </div>
-                <Link href="/logout">
-                    <button className="hover:bg-accent font-inconsolata text-lg hover:text-background text-text uppercase ease-in-out duration-500 border-2 shadow-lg shadow-accent/20 hover:shadow-accent/40 border-primary py-2 px-6 rounded-md">
-                            LogOut
-                    </button>
-                </Link>
-                
+                <SignOut></SignOut>
+
             </div>    
         </> : 
         <>
